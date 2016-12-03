@@ -15,6 +15,9 @@ print 'parents'
 print [commit.parents for commit in fifty_first_commits]
 
 print 'blobs'
-# TODO how to get blob content?
-print [[blob for blob in list(commit.tree.traverse()) if blob.type == 'blob'] for commit in fifty_first_commits]
+
+def read_blob(blob):
+    return blob.data_stream.read().decode('utf-8')
+
+print [[read_blob(blob) for blob in list(commit.tree.traverse()) if blob.type == 'blob'] for commit in fifty_first_commits]
 

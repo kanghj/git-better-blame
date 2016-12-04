@@ -7,21 +7,17 @@ import subprocess
 import itertools
 
 commands = {
-    'blame': "git blame --line-porcelain {}",
+    'blame': 'git blame --line-porcelain {}',
     'sed': ["sed", "-n", "s/^author //p"],
-    'ls': ['ls'],
 }
-
-tag = "@@author"
 
 if __name__ == "__main__":
     cwd = sys.argv[1]
     file = sys.argv[2]
     os.chdir(cwd)
 
-    blame = commands['blame'].format(file).split()
-
     try:
+        blame = commands['blame'].format(file).split()
         author_info = subprocess.Popen(blame, stdout=subprocess.PIPE,
                                        shell=True)
         sed_output = subprocess.Popen(commands['sed'],
@@ -36,7 +32,7 @@ if __name__ == "__main__":
     previous = ''
     for author in author_annotations:
         if author != previous:
-            collate_annotations.append(tag + ' ' + author)
+            collate_annotations.append('@@author ' + author)
         else:
             collate_annotations.append('')
         previous = author

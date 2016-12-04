@@ -10,7 +10,7 @@ import itertools
 def comment_tag(language):
     return '//';
 
-def annotate_single_file(filename):
+def git_blame_authors(filename):
     try:
         blame = 'git blame -w -M -C --line-porcelain {}'.format(filename).split()
 
@@ -23,24 +23,37 @@ def annotate_single_file(filename):
     except subprocess.CalledProcessError as e:
         print(e, file=sys.stderr)
         raise e
+    return author_annotations
+
+def annotate_only_first_line_of_block(author_annotations):
 
     collate_annotations = []
     previous = ''
     for author in author_annotations:
         collate_annotations.append(('@@author ' + author) if author != previous else '')
         previous = author
-    
+    return collate_annotations
+
+def contents_of_annotated_file(filename, annotations):
     result = []
     with open(filename) as source_file:
         for line, annotation in itertools.izip(
-                source_file, collate_annotations):
-            if len(annotation) == 0:
-                result.append(line)
-            else:
-                # todo determine comment from language, ignore empty lines
-                result.append(line.rstrip() + '\t\t' + comment_tag(extension) + annotation)
+                source_file, annotations):
+            annotated_file_line = line
 
+            if len(annotation) > 0:
+                comment_to_append = ('\t' + annotation) if comment_tag(extension) in line else '\t\t' + comment_tag(extension) + annotation
+                annotated_file_line += comment_to_append + '\n'
+
+            result.append(annotated_file_line)
     return result
+
+def annotate_single_file(filename):
+    author_annotations = git_blame_authors(filename)
+
+    collate_annotations = annotate_only_first_line_of_block(author_annotations)
+    
+    return contents_of_annotated_file(filename, collate_annotations)
 
 if __name__ == "__main__":
     directory = sys.argv[1]
@@ -54,6 +67,7 @@ if __name__ == "__main__":
         for filename in fnmatch.filter(filenames, '*.' + extension):
             annotated_results = annotate_single_file(root + '\\' + filename)
 
+
             with open('collated/' + filename + '.annotated', 'w+') as annotated_file:
                 for line in annotated_results:
-                    annotated_file.write(line + '\n')
+                    annotated_file.write(line)

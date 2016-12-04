@@ -7,9 +7,9 @@ import subprocess
 import itertools
 
 commands = {
-    'blame' : "git blame --line-porcelain {}",
-    'sed' : ["sed", "-n", "s/^author //p"],
-    'ls' : ['ls'],
+    'blame': "git blame --line-porcelain {}",
+    'sed': ["sed", "-n", "s/^author //p"],
+    'ls': ['ls'],
 }
 
 tag = "@@author"
@@ -19,13 +19,16 @@ if __name__ == "__main__":
     file = sys.argv[2]
     os.chdir(cwd)
 
-    command_split = commands['blame'].format(file).split()
+    blame = commands['blame'].format(file).split()
 
     try:
-        author_info = subprocess.Popen(command_split, stdout=subprocess.PIPE, shell=True) #cwd=r'C:/Users/user/SchoolLifeSimulator')
-        sed_output = subprocess.Popen(commands['sed'], stdin=author_info.stdout, stdout=subprocess.PIPE)
+        author_info = subprocess.Popen(blame, stdout=subprocess.PIPE,
+                                       shell=True)
+        sed_output = subprocess.Popen(commands['sed'],
+                                      stdin=author_info.stdout,
+                                      stdout=subprocess.PIPE)
         author_annotations = sed_output.communicate()[0].split("\n")
-    except subprocess.CalledProcessError as e :
+    except subprocess.CalledProcessError as e:
         print(e, file=sys.stderr)
         raise e
 
@@ -38,10 +41,11 @@ if __name__ == "__main__":
             collate_annotations.append('')
         previous = author
 
-
     with open(file) as source_file:
-        for line, annotation in itertools.izip(source_file, collate_annotations):
+        for line, annotation in itertools.izip(
+                source_file, collate_annotations):
             if len(annotation) == 0:
                 print(line)
             else:
-                print(line.rstrip() + '\t\t//' + annotation)  # todo determine comment from language, ignore empty lines
+                # todo determine comment from language, ignore empty lines
+                print(line.rstrip() + '\t\t//' + annotation)

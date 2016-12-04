@@ -7,12 +7,15 @@ import fnmatch
 import subprocess
 import itertools
 
+
 def comment_tag(language):
-    return '//';
+    return '//'
+
 
 def git_blame_authors(filename):
     try:
-        blame = 'git blame -w -M -C --line-porcelain {}'.format(filename).split()
+        blame = 'git blame -w -M -C --line-porcelain {}'.format(filename) \
+            .split()
 
         author_info = subprocess.Popen(blame, stdout=subprocess.PIPE,
                                        shell=True)
@@ -25,14 +28,17 @@ def git_blame_authors(filename):
         raise e
     return author_annotations
 
+
 def annotate_only_first_line_of_block(author_annotations):
 
     collate_annotations = []
     previous = ''
     for author in author_annotations:
-        collate_annotations.append(('@@author ' + author) if author != previous else '')
+        collate_annotations.append(
+            ('@@author ' + author) if author != previous else '')
         previous = author
     return collate_annotations
+
 
 def contents_of_annotated_file(filename, annotations):
     result = []
@@ -42,17 +48,21 @@ def contents_of_annotated_file(filename, annotations):
             annotated_file_line = line
 
             if len(annotation) > 0:
-                comment_to_append = ('\t' + annotation) if comment_tag(extension) in line else '\t\t' + comment_tag(extension) + annotation
+                is_line_containing_comment = comment_tag(extension) in line
+                comment_to_append = ('\t' + annotation) \
+                    if is_line_containing_comment \
+                    else '\t\t' + comment_tag(extension) + annotation
                 annotated_file_line += comment_to_append + '\n'
 
             result.append(annotated_file_line)
     return result
 
+
 def annotate_single_file(filename):
     author_annotations = git_blame_authors(filename)
 
     collate_annotations = annotate_only_first_line_of_block(author_annotations)
-    
+
     return contents_of_annotated_file(filename, collate_annotations)
 
 if __name__ == "__main__":
@@ -67,7 +77,7 @@ if __name__ == "__main__":
         for filename in fnmatch.filter(filenames, '*.' + extension):
             annotated_results = annotate_single_file(root + '\\' + filename)
 
-
-            with open('collated/' + filename + '.annotated', 'w+') as annotated_file:
+            collated_filename = 'collated/' + filename + '.annotated'
+            with open(collated_filename, 'w+') as annotated_file:
                 for line in annotated_results:
                     annotated_file.write(line)

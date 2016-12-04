@@ -6,21 +6,16 @@ import sys
 import subprocess
 import itertools
 
-commands = {
-    'blame': 'git blame -w -M -C --line-porcelain {}',
-    'sed': ["sed", "-n", "s/^author //p"],
-}
-
 if __name__ == "__main__":
     cwd = sys.argv[1]
     file = sys.argv[2]
     os.chdir(cwd)
 
     try:
-        blame = commands['blame'].format(file).split()
+        blame = 'git blame -w -M -C --line-porcelain {}'.format(file).split()
         author_info = subprocess.Popen(blame, stdout=subprocess.PIPE,
                                        shell=True)
-        sed_output = subprocess.Popen(commands['sed'],
+        sed_output = subprocess.Popen(["sed", "-n", "s/^author //p"],
                                       stdin=author_info.stdout,
                                       stdout=subprocess.PIPE)
         author_annotations = sed_output.communicate()[0].split("\n")

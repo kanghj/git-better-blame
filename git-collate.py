@@ -7,7 +7,7 @@ import subprocess
 import itertools
 
 commands = {
-    'blame': 'git blame --line-porcelain {}',
+    'blame': 'git blame -w -M -C --line-porcelain {}',
     'sed': ["sed", "-n", "s/^author //p"],
 }
 

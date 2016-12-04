@@ -17,8 +17,8 @@ def git_blame_authors(filename):
         blame = 'git blame -w -M -C --line-porcelain {}'.format(filename) \
             .split()
 
-        author_info = subprocess.Popen(blame, stdout=subprocess.PIPE,
-                                       shell=True)
+        author_info = subprocess.Popen(blame, stdout=subprocess.PIPE)
+        
         sed_output = subprocess.Popen(["sed", "-n", "s/^author //p"],
                                       stdin=author_info.stdout,
                                       stdout=subprocess.PIPE)
@@ -75,7 +75,7 @@ if __name__ == "__main__":
 
     for root, dirnames, filenames in os.walk('.'):
         for filename in fnmatch.filter(filenames, '*.' + extension):
-            annotated_results = annotate_single_file(root + '\\' + filename)
+            annotated_results = annotate_single_file(root + '/' + filename)
 
             collated_filename = 'collated/' + filename + '.annotated'
             with open(collated_filename, 'w+') as annotated_file:

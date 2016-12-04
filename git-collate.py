@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import os
 import sys
 import subprocess
@@ -10,6 +11,8 @@ commands = {
     'sed' : ["sed", "-n", "s/^author //p"],
     'ls' : ['ls'],
 }
+
+tag = "@@author"
 
 if __name__ == "__main__":
     cwd = sys.argv[1]
@@ -23,8 +26,22 @@ if __name__ == "__main__":
         sed_output = subprocess.Popen(commands['sed'], stdin=author_info.stdout, stdout=subprocess.PIPE)
         author_annotations = sed_output.communicate()[0].split("\n")
     except subprocess.CalledProcessError as e :
-        print e
+        print(e, file=sys.stderr)
+        raise e
 
-    with open('src/main/java/com/officelife/Main.java') as source_file:
-        for line, annotation in itertools.izip(source_file, author_annotations):
-            print line.rstrip() + '\t\t//' + annotation  # todo determine comment from language, ignore empty lines
+    collate_annotations = []
+    previous = ''
+    for author in author_annotations:
+        if author != previous:
+            collate_annotations.append(tag + ' ' + author)
+        else:
+            collate_annotations.append('')
+        previous = author
+
+
+    with open(file) as source_file:
+        for line, annotation in itertools.izip(source_file, collate_annotations):
+            if len(annotation) == 0:
+                print(line)
+            else:
+                print(line.rstrip() + '\t\t//' + annotation)  # todo determine comment from language, ignore empty lines

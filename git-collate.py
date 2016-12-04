@@ -56,4 +56,4 @@ if __name__ == "__main__":
 
             with open('collated/' + filename + '.annotated', 'w+') as annotated_file:
                 for line in annotated_results:
-                    annotated_file.write(line)
+                    annotated_file.write(line + '\n')

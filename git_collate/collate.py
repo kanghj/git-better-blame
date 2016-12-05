@@ -45,16 +45,16 @@ def contents_of_annotated_file(filename, annotations, extension):
     with open(filename) as source_file:
         for line, annotation in itertools.izip(
                 source_file, annotations):
-            annotated_file_line = line
 
+            annotated_file_line = line.rstrip()
             if len(annotation) > 0:
                 is_line_containing_comment = comment_tag(extension) in line
                 comment_to_append = ('\t' + annotation) \
                     if is_line_containing_comment \
                     else '\t\t' + comment_tag(extension) + annotation
-                annotated_file_line += comment_to_append + '\n'
+                annotated_file_line += comment_to_append 
 
-            result.append(annotated_file_line)
+            result.append(annotated_file_line + '\n')
     return result
 
 
@@ -64,6 +64,7 @@ def annotate_single_file(filename, extension):
     collate_annotations = annotate_only_first_line_of_block(author_annotations)
 
     return contents_of_annotated_file(filename, collate_annotations, extension)
+
 
 def collate(args=None):
     directory = sys.argv[1]

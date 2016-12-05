@@ -18,7 +18,7 @@ def git_blame_authors(filename):
             .split()
 
         author_info = subprocess.Popen(blame, stdout=subprocess.PIPE)
-        
+
         sed_output = subprocess.Popen(["sed", "-n", "s/^author //p"],
                                       stdin=author_info.stdout,
                                       stdout=subprocess.PIPE)
@@ -52,7 +52,7 @@ def contents_of_annotated_file(filename, annotations, extension):
                 comment_to_append = ('\t' + annotation) \
                     if is_line_containing_comment \
                     else '\t\t' + comment_tag(extension) + annotation
-                annotated_file_line += comment_to_append 
+                annotated_file_line += comment_to_append
 
             result.append(annotated_file_line + '\n')
     return result
@@ -71,18 +71,19 @@ def collate(args=None):
     extension = sys.argv[2]
     os.chdir(directory)
 
-    if not os.path.exists('collated'):
-        os.mkdir('collated')
+    collate_dir = 'collated'
+    if not os.path.exists(collate_dir):
+        os.mkdir(collate_dir)
 
     for root, dirnames, filenames in os.walk('.'):
         for filename in fnmatch.filter(filenames, '*.' + extension):
-            annotated_results = annotate_single_file(root + '/' + filename, extension)
+            annotated_results = annotate_single_file(
+                root + '/' + filename, extension)
 
-            collated_filename = 'collated/' + filename + '.annotated'
+            collated_filename = collate_dir + '/' + filename + '.annotated'
             with open(collated_filename, 'w+') as annotated_file:
                 for line in annotated_results:
                     annotated_file.write(line)
 
 if __name__ == "__main__":
     collate()
-    

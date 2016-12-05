@@ -13,20 +13,19 @@ if __name__ == "__main__":
 
     try:
         blame = 'git blame -w -M -C  --line-porcelain {}'.format(file).split()
-        author_info = subprocess.Popen(blame, stdout=subprocess.PIPE,
-                                       shell=True)
+        author_info = subprocess.Popen(blame, stdout=subprocess.PIPE)
         sed_output = subprocess.Popen(["sed", "-n", "s/^author //p"],
                                       stdin=author_info.stdout,
                                       stdout=subprocess.PIPE)
         sort_output = subprocess.Popen(['sort'],
-                                      stdin=sed_output.stdout,
-                                      stdout=subprocess.PIPE)
+                                       stdin=sed_output.stdout,
+                                       stdout=subprocess.PIPE)
         uniq_output = subprocess.Popen(['uniq', '-c'],
-                                      stdin=sort_output.stdout,
-                                      stdout=subprocess.PIPE)
+                                       stdin=sort_output.stdout,
+                                       stdout=subprocess.PIPE)
         sortrn_output = subprocess.Popen(['sort', '-rn'],
-                                      stdin=uniq_output.stdout,
-                                      stdout=subprocess.PIPE)
+                                         stdin=uniq_output.stdout,
+                                         stdout=subprocess.PIPE)
         authors_loc = uniq_output.communicate()[0]
 
     except subprocess.CalledProcessError as e:

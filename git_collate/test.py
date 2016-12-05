@@ -1,6 +1,6 @@
 
 import git
-from IPython import embed
+#from IPython import embed
 
 repo = git.Repo('/mnt/c/Users/user/SchoolLifeSimulator')
 
@@ -26,7 +26,7 @@ print [[read_blob(blob) for blob in list(commit.tree.traverse()) if blob.type ==
 def commit_diff_to_parent(repo, commit_sha):
 	commit = repo.commit(commit_sha)
 	a = commit.diff(commit.parents[0], create_patch=True)[0]
-	embed()
+#	embed()
 	return a.diff
 
 print('...')

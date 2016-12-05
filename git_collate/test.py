@@ -1,7 +1,8 @@
 
 import git
+from IPython import embed
 
-repo = git.Repo('/Users/darius/workspace/OfficeSimulatorThing')
+repo = git.Repo('/mnt/c/Users/user/SchoolLifeSimulator')
 
 fifty_first_commits = list(repo.iter_commits('master', max_count=50))
 
@@ -20,4 +21,16 @@ def read_blob(blob):
     return blob.data_stream.read().decode('utf-8')
 
 print [[read_blob(blob) for blob in list(commit.tree.traverse()) if blob.type == 'blob'] for commit in fifty_first_commits]
+
+
+def commit_diff_to_parent(repo, commit_sha):
+	commit = repo.commit(commit_sha)
+	a = commit.diff(commit.parents[0], create_patch=True)[0]
+	embed()
+	return a.diff
+
+print('...')
+
+
+print(commit_diff_to_parent(repo, '92ca4e'))
 

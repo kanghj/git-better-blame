@@ -43,18 +43,12 @@ def annotate_only_first_line_of_block(author_annotations):
 def contents_of_annotated_file(filename, annotations, extension):
     result = []
     with open(filename) as source_file:
-        for line, annotation in itertools.izip(
-                source_file, annotations):
-
-            annotated_file_line = line.rstrip()
+        for line, annotation in itertools.izip(source_file, annotations):
             if len(annotation) > 0:
-                is_line_containing_comment = comment_tag(extension) in line
-                comment_to_append = ('\t' + annotation) \
-                    if is_line_containing_comment \
-                    else '\t\t' + comment_tag(extension) + annotation
-                annotated_file_line += comment_to_append
+                result.append(comment_tag(extension) + annotation + '\n')
 
-            result.append(annotated_file_line + '\n')
+            result.append(line + '\n')
+
     return result
 
 

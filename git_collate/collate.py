@@ -11,6 +11,12 @@ import itertools
 def comment_tag(language):
     return '//'
 
+def tracked_files():
+    command = 'git ls-tree -r master --name-only'.split()
+    return subprocess.Popen(command, stdout=subprocess.PIPE) \
+                        .communicate()[0].split()
+
+
 
 def git_blame_authors(filename):
     try:
@@ -67,15 +73,15 @@ def collate(args=None):
     if not os.path.exists(collate_dir):
         os.mkdir(collate_dir)
 
-    for root, dirnames, filenames in os.walk('.'):
-        for filename in fnmatch.filter(filenames, '*.' + extension):
-            annotated_results = annotate_single_file(
-                root + '/' + filename, extension)
+    filenames = tracked_files()
+    for filename in fnmatch.filter(filenames, '*.' + extension):
+        annotated_results = annotate_single_file(
+            filename, extension)
 
-            collated_filename = collate_dir + '/' + filename + '.annotated'
-            with open(collated_filename, 'w+') as annotated_file:
-                for line in annotated_results:
-                    annotated_file.write(line)
+        collated_filename = collate_dir + '/' + filename.split('/')[-1] + '.annotated'
+        with open(collated_filename, 'w+') as annotated_file:
+            for line in annotated_results:
+                annotated_file.write(line)
 
 if __name__ == "__main__":
     collate()

@@ -61,9 +61,7 @@ def annotate_single_file(filename, extension):
 
 
 def collate(args=None):
-    directory = sys.argv[1]
-    extension = sys.argv[2]
-    os.chdir(directory)
+    extension = sys.argv[1]
 
     collate_dir = 'collated'
     if not os.path.exists(collate_dir):
